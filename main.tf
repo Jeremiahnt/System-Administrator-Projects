@@ -123,12 +123,6 @@ resource "azurerm_linux_virtual_machine" "IAC-vm" {
   disable_password_authentication = false
   network_interface_ids           = [azurerm_network_interface.IAC-nic.id]
 
-  custom_data = filebase64("customdata.tpl")
-  # admin_ssh_key {
-  #   username   = "GreggoSwag"
-  #   public_key = file("C:/Users/jeremiah.fong/test.pub")
-  # }
-
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
@@ -147,17 +141,6 @@ resource "azurerm_linux_virtual_machine" "IAC-vm" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
-
-  # provisioner "remote-exec" {
-  #   inline = ["echo 'Hello World!' > hello.txt", "sudo su", "apt install vim -y"]
-
-  #   connection {
-  #     type      = "ssh"
-  #     host      = azurerm_linux_virtual_machine.IAC-vm.name
-  #     user      = "GreggoSwag"
-  #     password  = random_password.password.result
-  #   }
-  # }
 
   tags = {
     environment = "dev"
