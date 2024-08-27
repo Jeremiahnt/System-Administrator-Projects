@@ -100,7 +100,7 @@ variable "username" {
 }
 variable "password" {
   type    = string
-  default = "VvsmsTHaXiQ8zMmTdddCQKjLT7HZE9"
+  default = "P@$$w0RD23lp"
 }
 
 resource "azurerm_virtual_machine" "AZ-DC-Master" {               
