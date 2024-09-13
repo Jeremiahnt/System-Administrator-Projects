@@ -61,6 +61,7 @@ data "aws_ami" "vm-image" {
 }
 
 resource "aws_instance" "vm" {
+  count         = 2 
   ami           = data.aws_ami.vm-image.id
   instance_type = "t2.micro"
 
@@ -70,4 +71,8 @@ resource "aws_instance" "vm" {
   }
 
   user_data = file("apache.sh")
+
+  tags = {
+    Name = "VM-${count.index + 1}" 
+  }
 }
