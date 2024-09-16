@@ -1,5 +1,4 @@
 resource "aws_eip" "eip-iac" {
-  instance = aws_instance.vm.id
   domain   = "vpc"
 }
 

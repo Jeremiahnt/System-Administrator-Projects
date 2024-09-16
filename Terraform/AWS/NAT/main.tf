@@ -1,9 +1,3 @@
-resource "aws_route" "aws-route-iac" {
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.igw-iac.id
-  route_table_id         = aws_route_table.route-table-iac.id
-}
-
 resource "aws_security_group" "sg-iac" {
   name        = "iac"
   description = "security group for vm deployment"
@@ -38,12 +32,6 @@ resource "aws_security_group" "sg-iac" {
   ]
 }
 
-resource "aws_network_interface" "nic-iac" {
-  subnet_id       = aws_subnet.subnet-iac-1.id
-  private_ip      = "10.0.1.20"
-  security_groups = [aws_security_group.sg-iac.id]
-}
-
 data "aws_ami" "vm-image" {
   most_recent = true
 
@@ -60,19 +48,31 @@ data "aws_ami" "vm-image" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_instance" "vm" {
-  count         = 2 
-  ami           = data.aws_ami.vm-image.id
-  instance_type = "t2.micro"
-
-  network_interface {
-    network_interface_id = aws_network_interface.nic-iac.id
-    device_index         = 0
+locals {
+  web_servers = {
+    my-app-00 = {
+      machine_type = "t2.micro"
+      subnet_id    = aws_subnet.private_us_east_1a.id
+    }
+    my-app-01 = {
+      machine_type = "t2.micro"
+      subnet_id    = aws_subnet.private_us_east_1b.id
+    }
   }
+}
+
+
+resource "aws_instance" "vm" {
+  for_each      = local.web_servers
+
+  ami           = data.aws_ami.vm-image.id
+  instance_type = each.value.machine_type
+  subnet_id     = each.value.subnet_id
+  vpc_security_group_ids = [aws_security_group.sg-iac.id]
 
   user_data = file("apache.sh")
 
   tags = {
-    Name = "VM-${count.index + 1}" 
+    Name = each.key 
   }
 }
